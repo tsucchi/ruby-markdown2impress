@@ -22,7 +22,7 @@ Or install it yourself as:
 
 
 1. Write markdown.
-2. Run **markdown2impressl**, then generate 'js/impress.js', 'css/impress.css' and 'index.html'.
+2. Run **markdown2impress**, then generate 'js/impress.js', 'css/impress.css' and 'index.html'.
 
     $ markdown2impress README.md
 
