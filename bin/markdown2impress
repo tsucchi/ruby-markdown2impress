@@ -142,7 +142,12 @@ def syntax_highlighter(html)
     next if pre.children.attribute("class").nil?
     pre.replace Pygments.highlight(pre.text.rstrip, lexer: pre.children.attribute("class").value)
   }
-  doc.to_s
+  result = doc.to_s
+  # nokogiri adds DOCTYPE and html tags automatically...
+  result.sub!('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">', '')
+  result.sub!('<html><body>', '')
+  result.sub!('</body></html>', '')
+  result
 end
 
 def output_static_files(outputdir)
