@@ -24,8 +24,6 @@ def main
   op.on("-r", "--reload")        { |r| $opts[:reload] = true  }
 
   op.parse!(ARGV)
-
-  $section_re = /(?:.+[ \t]*\n[-=]+[ \t]*\n*(?:(?!.+[ \t]*\n[-=]+[ \t]*\n*)(?:.|\n))*)/
   mdfile = ARGV[0]
 
   if mdfile.nil? || !File.exist?(mdfile) then
@@ -78,9 +76,10 @@ end
 
 def parse_markdown(mdfile)
   sections = []
+  section_re = /(?:.+[ \t]*\n[-=]+[ \t]*\n*(?:(?!.+[ \t]*\n[-=]+[ \t]*\n*)(?:.|\n))*)/
   open(mdfile) { |f|
     md = f.read
-    md.scan($section_re) { |matched|
+    md.scan(section_re) { |matched|
       sections.push(matched)
     }
   }
@@ -151,43 +150,32 @@ def syntax_highlighter(html)
 end
 
 def output_static_files(outputdir)
-  impress_js       = get_impress_js
-  impress_demo_css = get_impress_css
-  pygments_css     = get_pygments_css
+  jsdir  = try_mkdir(outputdir, 'js')
+  cssdir = try_mkdir(outputdir, 'css')
 
-  jsdir = File.join(outputdir, 'js')
-  unless  File.directory?(jsdir) then
-    Dir::mkdir(jsdir)
-  end
-
-  cssdir = File.join(outputdir, 'css');
-  unless File.directory?(cssdir) then
-    Dir::mkdir(cssdir)
-  end
-
-  jsfile = File.join(jsdir, 'impress.js')
-  unless File.exists?(jsfile) then
-    File.open(jsfile, "w") { |f|
-      f.write(impress_js)
-    }
-  end
-
-  cssfile = File.join(cssdir, 'impress.css')
-  unless File.exists?(cssfile) then
-    File.open(cssfile, "w") { |f|
-      f.write(impress_demo_css)
-    }
-  end
-
-  pygments = File.join(cssdir, 'pygments.css')
-  unless File.exists?(pygments) then
-    File.open(pygments, "w") { |f|
-      f.write(pygments_css)
-    }
-  end
-
+  try_write_file(jsdir,  'impress.js',   get_impress_js)
+  try_write_file(cssdir, 'impress.css',  get_impress_css)
+  try_write_file(cssdir, 'pygments.css', get_pygments_css)
 end
 
+# mkdir if dir is not exist
+def try_mkdir(outputdir, dirname)
+  dir = File.join(outputdir, dirname);
+  unless File.directory?(dir) then
+    Dir::mkdir(dir)
+  end
+  dir
+end
+
+# write file if file is not exist
+def try_write_file(dir, filename, file_content)
+  path = File.join(dir, filename)
+  unless File.exists?(path) then
+    File.open(path, "w") { |f|
+      f.write(file_content)
+    }
+  end
+end
 
 def get_index_html
   return <<"EOS"
