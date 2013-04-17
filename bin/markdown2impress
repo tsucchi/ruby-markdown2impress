@@ -47,7 +47,7 @@ def run(mdfile)
   content = parse_markdown(mdfile)
   title = content =~ /<h1>([^<]+)<\/h1>/ ? $1 : ''
   
-  index_html = get_data_section( 'index.html' )
+  index_html = get_index_html
 
   erb = ERB.new(index_html)
   output = erb.result(binding)
@@ -151,9 +151,9 @@ def syntax_highlighter(html)
 end
 
 def output_static_files(outputdir)
-  impress_js       = get_data_section('impress.js');
-  impress_demo_css = get_data_section('impress.css');
-  pygments_css     = get_data_section('pygments.css');
+  impress_js       = get_impress_js
+  impress_demo_css = get_impress_css
+  pygments_css     = get_pygments_css
 
   jsdir = File.join(outputdir, 'js')
   unless  File.directory?(jsdir) then
@@ -188,28 +188,9 @@ def output_static_files(outputdir)
 
 end
 
-$result_href = {}
-def get_data_section(section_name)
-  current = nil
-  if $result_href.empty? then
-    DATA.each { |line|
-      line.chomp!
-      if line =~ /^@@\s*(.+?)\s*$/ then
-        current = $1
-        $result_href[current] = ''
-      elsif !current.nil?
-        $result_href[current] += "#{line}\n"
-      end
-    }
-  end
-  return $result_href[section_name]
-end
 
-main()
-
-__END__
-
-@@ index.html
+def get_index_html
+  return <<"EOS"
 <!doctype html>
 <html>
 <head>
@@ -245,7 +226,11 @@ if ("ontouchstart" in document.documentElement) {
 </body>
 </html>
 
-@@ impress.js
+EOS
+end
+
+def get_impress_js
+  return <<"EOS"
 
 /**
  * impress.js
@@ -574,7 +559,7 @@ if ("ontouchstart" in document.documentElement) {
     var getElementFromUrl = function () {
         // get id from url # by removing `#` or `#/` from the beginning,
         // so both "fallback" `#slide-id` and "enhanced" `#/slide-id` will work
-        return byId( window.location.hash.replace(/^#\/?/,"") );
+        return byId( window.location.hash.replace(/^#\\/?/,"") );
     }
     
     window.addEventListener("hashchange", function () {
@@ -587,7 +572,11 @@ if ("ontouchstart" in document.documentElement) {
 
 })(document, window);
 
-@@ impress.css
+EOS
+end
+
+def get_impress_css
+  return <<"EOS"
 
 /**
  * This is a stylesheet for a demo presentation for impress.js
@@ -1127,7 +1116,11 @@ body     { pointer-events: none; }
     display: block;
 }
 
-@@ pygments.css
+EOS
+end
+
+def get_pygments_css
+  return <<"EOS"
 .hll { background-color: #ffffcc }
 .c { color: #408080; font-style: italic } /* Comment */
 .err { border: 1px solid #FF0000 } /* Error */
@@ -1190,3 +1183,7 @@ body     { pointer-events: none; }
 .vi { color: #19177C } /* Name.Variable.Instance */
 .il { color: #666666 } /* Literal.Number.Integer.Long */
 
+EOS
+end
+
+main()
