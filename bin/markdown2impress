@@ -65,7 +65,7 @@ end
 def auto_reload_run(mdfile)
   run(mdfile)
   puts "Watching #{mdfile} for file updates.";
-
+  EM.kqueue = true if EM.kqueue?
   EM.run do
     Signal.trap("INT")  { EM.stop }
     Signal.trap("TRAP") { EM.stop }
