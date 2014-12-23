@@ -13,15 +13,17 @@ $opts = {
   max_column:  5,
   outputdir:   Dir::getwd,
   reload:      false,
+  account:     nil,
 }
 
 def main 
   op = OptionParser.new
-  op.on("--width N", Integer)    { |w| $opts[:width] = w      }
-  op.on("--height N", Integer)   { |h| $opts[:height] = h     }
-  op.on("--column N", Integer)   { |c| $opts[:max_column] = c }
-  op.on("--outputdir N", String) { |o| $opts[:outputdir] = o  }
-  op.on("-r", "--reload")        { |r| $opts[:reload] = true  }
+  op.on("--width N", Integer)                   { |w| $opts[:width] = w      }
+  op.on("--height N", Integer)                  { |h| $opts[:height] = h     }
+  op.on("--column N", Integer)                  { |c| $opts[:max_column] = c }
+  op.on("--outputdir N", String)                { |o| $opts[:outputdir] = o  }
+  op.on("-r", "--reload")                       { |r| $opts[:reload] = true  }
+  op.on("--google-analytics-account N", String) { |a| $opts[:account] = a}
 
   op.parse!(ARGV)
   mdfile = ARGV[0]
@@ -45,7 +47,8 @@ def run(mdfile)
   content = parse_markdown(mdfile)
   title = content =~ /<h1>([^<]+)<\/h1>/ ? $1 : ''
   
-  index_html = get_index_html
+  google_analytics_tag = get_google_analytics_tag()
+  index_html = get_index_html(google_analytics_tag)
 
   erb = ERB.new(index_html)
   output = erb.result(binding)
@@ -177,7 +180,7 @@ def try_write_file(dir, filename, file_content)
   end
 end
 
-def get_index_html
+def get_index_html(script)
   return <<"EOS"
 <!doctype html>
 <html>
@@ -216,6 +219,9 @@ jQuery(function($){
   $("a[href^='http']").attr('target', '_blank');
 });
 </script>
+
+#{script}
+
 <script src="js/impress.js"></script>
 </body>
 </html>
@@ -1177,6 +1183,29 @@ def get_pygments_css
 .vi { color: #19177C } /* Name.Variable.Instance */
 .il { color: #666666 } /* Literal.Number.Integer.Long */
 
+EOS
+end
+
+def get_google_analytics_tag()
+
+  account = $opts[:account]
+
+  if account.nil? then
+    return ""
+  end
+
+  return <<"EOS"
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', '#{account}']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
 EOS
 end
 
