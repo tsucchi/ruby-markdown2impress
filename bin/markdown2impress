@@ -79,7 +79,7 @@ end
 
 def parse_markdown(mdfile)
   sections = []
-  section_re = /(?:.+[ \t]*\n[-=]+[ \t]*\n*(?:(?!.+[ \t]*\n[-=]+[ \t]*\n*)(?:.|\n))*)/
+  section_re = /^(?: {,3}\S.*\r?\n[-=]+[ \t]*|#+[ \t]*.+)\r?\n(?:(?!^(?: {,3}\S.*\r?\n[-=]+[ \t]*|#+[ \t]*.+)\r?\n)(?:.|\r?\n))*/
   open(mdfile) { |f|
     md = f.read
     md.scan(section_re) { |matched|
