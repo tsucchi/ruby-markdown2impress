@@ -16,4 +16,9 @@ Gem::Specification.new do |gem|
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
+
+  gem.add_runtime_dependency("nokogiri", "~> 1.6")
+  gem.add_runtime_dependency("eventmachine", "~> 1.0")
+  gem.add_runtime_dependency("redcarpet", "~> 3.2")
+  gem.add_runtime_dependency("pygments.rb", "~> 0.6")
 end
