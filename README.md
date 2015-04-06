@@ -8,7 +8,7 @@ This is re-written in ruby to support GitHub Flavored Markdown(redcarpet).
 
 Add this line to your application's Gemfile:
 
-    gem 'markdown2impress'
+    gem 'markdown2impress', :github => 'tsucchi/ruby-markdown2impress'
 
 And then execute:
 
@@ -16,10 +16,17 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install markdown2impress
+    $ git clone https://github.com/tsucchi/ruby-markdown2impress
+    $ cd ruby-markdown2impress
+    $ gem build markdown2impress.gemspec
+    $ gem install markdown2impress-0.0.1.gem
+
+Or use [specific_install](https://rubygems.org/gems/specific_install) gem:
+
+    $ gem install specific_install
+    $ gem specific_install tsucchi/ruby-markdown2impress
 
 ## Usage
-
 
 1. Write markdown.
 2. Run **markdown2impress**, then generate 'js/impress.js', 'css/impress.css' and 'index.html'.
